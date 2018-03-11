@@ -100,8 +100,6 @@ while(cap.isOpened()):
     # ['car', ' 0.48', ' 500', ' 642', ' 386', ' 452']
     updateTrackers(frame)
 
-    
-
     if runningFrameIdx in persons:
       for i in persons[runningFrameIdx]:
         cv2.rectangle(frame, (i[2], i[4]), (i[3], i[5]), (255,0,0), 2)
@@ -111,13 +109,13 @@ while(cap.isOpened()):
         cv2.rectangle(frame, (i[2], i[4]), (i[3], i[5]), (0,255,0), 2)
 
         #l,t,r,b
-    if runningFrameIdx >= 77 and runningFrameIdx < 100:
-      if runningFrameIdx in cars:
-        for i in cars[runningFrameIdx]:
-          # print(i)
-          tracker = dlib.correlation_tracker()
-          tracker.start_track(frame, dlib.rectangle(i[2], i[4], i[3], i[5]))
-          trackers.append(tracker)
+    # if runningFrameIdx >= 77 and runningFrameIdx < 100:
+    if runningFrameIdx in cars:
+      for i in cars[runningFrameIdx]:
+        # print(i)
+        tracker = dlib.correlation_tracker()
+        tracker.start_track(frame, dlib.rectangle(i[2], i[4], i[3], i[5]))
+        trackers.append(tracker)
 
     # print('current:', len(trackers))  
     destroyTrackers()
