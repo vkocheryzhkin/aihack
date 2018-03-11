@@ -83,7 +83,7 @@ def mergeTrackers():
 
 def alreadyTracked(yolo_rect):
   for trac in trackers:
-    if rectIntersection(trac.get_position(), yolo_rect.get_position()) > 0.6 :
+    if rectIntersection(trac.get_position(), yolo_rect) > 0.6 :
       return True
   return False
 
@@ -96,7 +96,7 @@ frame_width = int(cap.get(3))
 frame_height = int(cap.get(4))
 
 out = cv2.VideoWriter('res.avi',cv2.VideoWriter_fourcc('D', 'I', 'V', 'X'), 20, (frame_width,frame_height))
-found = false;
+# found = false;
 
 while(cap.isOpened()):
   ret, frame = cap.read()
@@ -122,7 +122,7 @@ while(cap.isOpened()):
         # print(i)
         yolo_rect = dlib.rectangle(i[2], i[4], i[3], i[5])
         if alreadyTracked(yolo_rect):
-          pass:
+          pass
         else:
           tracker = dlib.correlation_tracker()
           tracker.start_track(frame, yolo_rect)
