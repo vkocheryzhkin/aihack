@@ -51,14 +51,12 @@ runningFrameIdx = 0
 trackers = []
 # initTr = False
 
-def rectIntersection(r1, r2):
-  left = max(r1.left(), r2.left())
-  right = min(r1.right(), r2.right())
-  bottom = max(r1.bottom(), r2.bottom())
-  top = min(r1.top(), r2.top())
-  if left < right and bottom < top:
-    intersection = (right - left) * (top - bottom)
-    unionArea = ((r1.right() - r1.left()) * (r1.top() - r1.bottom())) + ((r2.right() - r2.left()) * (r2.top() - r2.bottom())) - intersection;
+def rectIntersection(a, b):
+  dx = min(a.right(), b.right()) - max(a.left(), b.left())
+  dy = min(a.bottom(), b.bottom()) - max(a.top(), b.top())
+  if (dx>=0) and (dy>=0):
+    intersection = dx * dy
+    unionArea = (a.right() - a.left()) * (a.bottom() - a.top()) + (b.right() - b.left()) * (b.bottom() - b.top()) - intersection
     return intersection * 1.0 / unionArea
   else:
     return 0
@@ -76,7 +74,8 @@ def updateTrackers(frame):
 def destroyTrackers():
   for i in trackers:
     for j in trackers:
-      if i != j and rectIntersection(i.get_position(), j.get_position()) > 0.9:
+      # print("intersect: ", rectIntersection(i.get_position(), j.get_position()))
+      if i != j and rectIntersection(i.get_position(), j.get_position()) > 0.5:
         trackers.remove(j)
 
 def mergeTrackers():
@@ -101,6 +100,8 @@ while(cap.isOpened()):
     # ['car', ' 0.48', ' 500', ' 642', ' 386', ' 452']
     updateTrackers(frame)
 
+    
+
     if runningFrameIdx in persons:
       for i in persons[runningFrameIdx]:
         cv2.rectangle(frame, (i[2], i[4]), (i[3], i[5]), (255,0,0), 2)
@@ -110,7 +111,7 @@ while(cap.isOpened()):
         cv2.rectangle(frame, (i[2], i[4]), (i[3], i[5]), (0,255,0), 2)
 
         #l,t,r,b
-    if runningFrameIdx >=77 and runningFrameIdx < 100:
+    if runningFrameIdx >= 77 and runningFrameIdx < 100:
       if runningFrameIdx in cars:
         for i in cars[runningFrameIdx]:
           # print(i)
@@ -118,7 +119,9 @@ while(cap.isOpened()):
           tracker.start_track(frame, dlib.rectangle(i[2], i[4], i[3], i[5]))
           trackers.append(tracker)
 
+    # print('current:', len(trackers))  
     destroyTrackers()
+    # print('destoyed', len(trackers))
       
     out.write(frame)
   else:
