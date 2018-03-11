@@ -1,8 +1,17 @@
 # aihack (CRT problem solving...)
 
-### Idea behind
+## Data
+test.dat Пример аварии.flv
+test2.dat Два торопыги.flv
 
-### Projects used
+## Idea behind
+
+### Preprocess by YOLO
+https://github.com/hoopoe/darknet/commits/master
+
+### Enable dlib Tracker
+  
+## Projects used
 We used several projects, that helped us a lot of 
 * dlib - for correlation tracker purpose
 * YOLA - for fragmenting cars based on the frame
