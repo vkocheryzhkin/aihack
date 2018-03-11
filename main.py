@@ -7,25 +7,31 @@ import glob
 import dlib
 from skimage import io
 
+import argparse
+
 frames = []
 
 persons = {} #value is array
 cars = {}
 
+num_frames_to_keep_trace = 10
 trackers = []
+trackers_trace = [] # key is a tracker, value is a list of rects for last num_frames_to_keep_trace
+
+yolo_rect_file = ""
+video_src_file = ""
+vidoe_out_file = ""
 
 def readYOLO():
   runningDataIdx = 0
-  f = open("test.dat") #yolo rectangles
+  f = open(yolo_rect_file) #yolo rectangles
   lines = f.readlines()
   for i in lines:
     if "frame:" in i:
       tmp = i.strip().split(":")
       runningDataIdx = int(tmp[1])
-      # print(runningDataIdx)
     else:
       if ',' and 'person' in i:
-        # print(parsRect(i))
         if runningDataIdx not in persons:
           persons[runningDataIdx] = []
         persons[runningDataIdx].append(parsRect(i))
@@ -63,13 +69,10 @@ def updateTrackers(frame):
     p = int(p.bottom())
     cv2.rectangle(frame, (l, t), (r, p), (0,0,255), 2)
 
-# def destroyTrackers():
-#   for i in trackers:
-#     for j in trackers:
-#       if i != j and rectIntersection(i.get_position(), j.get_position()) > 0.5:
-#         trackers.remove(j)
+def destroyTrackers(): #todo:
+  pass
 
-def mergeTrackers():
+def mergeTrackers(): #todo:
   pass
 
 def alreadyTracked(yolo_rect):
@@ -80,7 +83,7 @@ def alreadyTracked(yolo_rect):
 
 def run():
   runningFrameIdx = 0
-  cap = cv2.VideoCapture('test.flv')
+  cap = cv2.VideoCapture(video_src_file)
 
   if (cap.isOpened()== False): 
     print("Error opening video stream or file")
@@ -88,7 +91,7 @@ def run():
   frame_width = int(cap.get(3))
   frame_height = int(cap.get(4))
 
-  out = cv2.VideoWriter('res.avi',cv2.VideoWriter_fourcc('D', 'I', 'V', 'X'), 20, (frame_width,frame_height))
+  out = cv2.VideoWriter(video_out_file, cv2.VideoWriter_fourcc('D', 'I', 'V', 'X'), 20, (frame_width,frame_height))
 
   while(cap.isOpened()):
     ret, frame = cap.read()
@@ -119,12 +122,14 @@ def run():
             tracker.start_track(frame, yolo_rect)
             trackers.append(tracker)
 
-      # print('frame: {0}, trackers: {1}'.format(runningFrameIdx, len(trackers)))
+      #todo: add tracker for persons
         
       out.write(frame)
 
-      # if runningFrameIdx > 300:
+      #todo: remove
+      # if runningFrameIdx > 100: 
       #   break
+
     else:
       break
 
@@ -132,5 +137,15 @@ def run():
   out.release()
 
 if __name__ == "__main__":
+  parser = argparse.ArgumentParser()
+  parser.add_argument('--src', help='video file', default='test.flv')
+  parser.add_argument('--src_dat', help='YOLO rects for video', default='test.dat') #video preprocessed
+  parser.add_argument('--dst', help='destination video file', default='test.avi')
+  
+  args = parser.parse_args()
+  yolo_rect_file = args.src_dat
+  video_src_file = args.src
+  video_out_file = args.dst
+
   readYOLO()
   run()
