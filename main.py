@@ -81,6 +81,12 @@ def destroyTrackers():
 def mergeTrackers():
   pass
 
+def alreadyTracked(yolo_rect):
+  for trac in trackers:
+    if rectIntersection(trac.get_position(), yolo_rect.get_position()) > 0.6 :
+      return True
+  return False
+
 cap = cv2.VideoCapture('test.flv')
 
 if (cap.isOpened()== False): 
@@ -90,6 +96,7 @@ frame_width = int(cap.get(3))
 frame_height = int(cap.get(4))
 
 out = cv2.VideoWriter('res.avi',cv2.VideoWriter_fourcc('D', 'I', 'V', 'X'), 20, (frame_width,frame_height))
+found = false;
 
 while(cap.isOpened()):
   ret, frame = cap.read()
@@ -113,12 +120,28 @@ while(cap.isOpened()):
     if runningFrameIdx in cars:
       for i in cars[runningFrameIdx]:
         # print(i)
-        tracker = dlib.correlation_tracker()
-        tracker.start_track(frame, dlib.rectangle(i[2], i[4], i[3], i[5]))
-        trackers.append(tracker)
+        yolo_rect = dlib.rectangle(i[2], i[4], i[3], i[5])
+        if alreadyTracked(yolo_rect):
+          pass:
+        else:
+          tracker = dlib.correlation_tracker()
+          tracker.start_track(frame, yolo_rect)
+          trackers.append(tracker)
+
+
+        # found = False
+        # for trac in trackers:
+        #   if rectIntersection(trac.get_position(), yolo_rect.get_position()) > 0.6 
+        #     found = True;
+        #     return;#found
+            
+        # if (!found)
+        #   tracker = dlib.correlation_tracker()
+        #   tracker.start_track(frame, yolo_rect)
+        #   trackers.append(tracker)
 
     # print('current:', len(trackers))  
-    destroyTrackers()
+    # destroyTrackers()
     # print('destoyed', len(trackers))
       
     out.write(frame)
