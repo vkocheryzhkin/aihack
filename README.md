@@ -17,3 +17,6 @@ We used several projects, that helped us a lot of
 * YOLA - for fragmenting cars based on the frame
 * darknet/+ that just persist file on the disk
 
+## Algorithm description
+
+![Algorithm description](hack-ai-crt-flow.png)
