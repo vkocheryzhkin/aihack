@@ -42,31 +42,27 @@ import glob
 
 import dlib
 from skimage import io
+import math
 
-# Path to the video frames
-video_folder = os.path.join("..", "examples", "video_frames")
+# from shapely.geometry import Polygon
 
-# Create the correlation tracker - the object needs to be initialized
-# before it can be used
-tracker = dlib.correlation_tracker()
+def rectIntersection(r1, r2):
+  left = max(r1.left(), r2.left())
+  right = min(r1.right(), r2.right())
+  bottom = max(r1.bottom(), r2.bottom())
+  top = min(r1.top(), r2.top())
+  if left < right and bottom < top:
+    intersection = (right - left) * (top - bottom)
+    unionArea = ((r1.right() - r1.left()) * (r1.top() - r1.bottom())) + ((r2.right() - r2.left()) * (r2.top() - r2.bottom())) - intersection;
+    return intersection * 1.0 / unionArea
+  else:
+    return 0
 
-win = dlib.image_window()
-# We will track the frames as we load them off of disk
-for k, f in enumerate(sorted(glob.glob(os.path.join(video_folder, "*.jpg")))):
-    print("Processing Frame {}".format(k))
-    img = io.imread(f)
 
-    # We need to initialize the tracker on the first frame
-    if k == 0:
-        # Start a track on the juice box. If you look at the first frame you
-        # will see that the juice box is contained within the bounding
-        # box (74, 67, 112, 153).
-        tracker.start_track(img, dlib.rectangle(74, 67, 112, 153))
-    else:
-        # Else we just attempt to track from the previous frame
-        tracker.update(img)
+# dlib.rectangle(left: int, top: int, right: int, bottom: int)
+a = dlib.rectangle( 1, 2, 2, 1)
+b = dlib.rectangle( 1, 2, 3, 1)
+# print(rectIntersection(a,b))
 
-    win.clear_overlay()
-    win.set_image(img)
-    win.add_overlay(tracker.get_position())
-    dlib.hit_enter_to_continue()
+print(a == b)
+print(a == a)
